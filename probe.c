@@ -1,72 +1,74 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#include<string.h>
-#include<time.h>
-#include<errno.h>
-#include<unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <time.h>
 #define MSG_CONFIRM 0
 #define TRUE 1
 #define FALSE 0
-
-typedef struct list
-{
-  int probe[3];
+typedef struct list{
+	int probe[3];	
 }list;
 
-int connect_to_port(int connect_to)
+
+int connect_to_port (int connect_to)
 {
   int sock_id;
-  int opt;
+  int opt = 1;
   struct sockaddr_in server;
-  if(sock_id=SOCKET(AF_INET,SOCK_DGRAM,0)<0)
-  {
-    printf("Socket creation failed!");
-    exit(EXIT_FAILURE);
-  }
-  setsockopt(sock_id,SOL_SOCK,SO_REUSEADDR,(const void *)&opt,sizeof(opt));
-  memset(&server,0,sizeof(server));
+  if ((sock_id = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      perror ("Socket creation failed!");
+      exit (EXIT_FAILURE);
+    }
+  setsockopt (sock_id, SOL_SOCKET, SO_REUSEADDR, (const void *) &opt, sizeof (int));
+  memset (&server, 0, sizeof (server));
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(connect_to);
-  if(bind(sock_id,(const struct sockaddr *)&server,sizeof(server))<0)
-  {
-    printf("Binding failed!");
-    exit(EXIT_FAILURE);
-  }
+  server.sin_port = htons (connect_to);
+  if (bind (sock_id, (const struct sockaddr *) &server, sizeof (server)) < 0)
+    {
+      perror ("Binding failed!");
+      exit (EXIT_FAILURE);
+    }
   return sock_id;
 }
 
-void send_to_id(int to,int id,list llist)
+
+void send_to_id (int to, int id, list llist)
 {
   struct sockaddr_in cl;
-  memset(&cl,0,sizeof(cl));
+  memset (&cl, 0, sizeof (cl));
   cl.sin_family = AF_INET;
   cl.sin_addr.s_addr = INADDR_ANY;
-  cl.sin_port = HTONS(to);
-  sendto(id,&llist,sizeof(llist),MSG_CONFIRM,(const struct sockaddr *)&cl,sizeof(cl));
-    
+  cl.sin_port = htons (to);
+  sendto (id, &llist, sizeof(list), MSG_CONFIRM, (const struct sockaddr *) &cl, sizeof (cl));
 }
 
-void send_probes(int id,int self,int *procs,int n_edges,list l)
+
+void send_probes (int id, int self,int *procs,int n_edges,list l)
 {
-  for(int i=0;i<n_edges;i++)
-    {
-      l.probe[2]=procs[i];
-      printf("Sending to :%d\n",procs[i];
-      send_to_id(procs[i],id,l);
-    }
+  	
+  	for (int i = 0; i < n_edges; i++)
+	{
+		l.probe[2]=procs[i];
+		printf ("Sending msg to: %d\n", procs[i]);
+		send_to_id (procs[i], id, l);
+	}
+	 
 }
 
 void print(list l)
 {
-  for(int i=0;i<3;i++)
-    {
-      printf("%d",l.procs[i]);
-    }
+	for(int i=0;i<3;i++)
+	{
+		printf("%d ",l.probe[i]);
+	}
 }
 
 int main (int argc, char *argv[])
@@ -108,7 +110,7 @@ int main (int argc, char *argv[])
 		printf("\n");
 		if(l.probe[0]==-1)
 		{
-			printf("Deadlock has happened");
+			printf("Deadlock has Occured!");
 			send_probes(sock_id,self,procs,n_edges,l);
 			break;
 		}
@@ -130,7 +132,4 @@ int main (int argc, char *argv[])
   	}
   
 }
-
-
-
 
