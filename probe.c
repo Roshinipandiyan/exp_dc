@@ -110,13 +110,13 @@ int main (int argc, char *argv[])
 		printf("\n");
 		if(l.probe[0]==-1)
 		{
-			printf("Deadlock has Occured!");
+			printf("Deadlock has Occured!\n");
 			send_probes(sock_id,self,procs,n_edges,l);
 			break;
 		}
 		if(l.probe[0]==self)
 		{
-			printf("Deadlock is detected");
+			printf("Deadlock is detected\n");
 			l.probe[0]=-1;
 			send_probes(sock_id,self,procs,n_edges,l);
 			break;
